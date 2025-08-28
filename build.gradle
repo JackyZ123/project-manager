@@ -1,0 +1,93 @@
+plugins {
+    id 'org.springframework.boot' version '3.5.3' // or 4.0.0-M2
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'java'
+}
+
+group = 'org.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // https://mvnrepository.com/artifact/org.webjars/bootstrap
+    implementation 'org.webjars:bootstrap:5.3.3'
+
+    // https://mvnrepository.com/artifact/com.h2database/h2
+    implementation 'com.h2database:h2:2.3.232'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// --- React Build Integration ---
+// by ChatGPT
+def frontendDir = "$projectDir/src/main/frontend"
+
+// Install dependencies
+tasks.register('installFrontend', Exec) {
+    workingDir frontendDir
+    commandLine 'npm', 'install'
+}
+
+// Build React app
+tasks.register('buildFrontend', Exec) {
+    dependsOn 'installFrontend'
+    workingDir frontendDir
+    commandLine 'npm', 'run', 'build'
+
+    // Tell Gradle what files are inputs/outputs
+    inputs.dir("$frontendDir/src")
+    inputs.file("$frontendDir/package.json")
+    inputs.file("$frontendDir/package-lock.json")  // or yarn.lock
+    outputs.dir("$frontendDir/build")
+}
+
+// Copy React build to Spring Boot static
+tasks.register('copyFrontend', Copy) {
+    dependsOn 'buildFrontend'
+
+    // Copy the entire build folder
+    from("$frontendDir/build") {
+        // Exclude index.html from this copy
+        exclude 'index.html'
+        into 'react' // put the rest of the build into /static/react
+    }
+
+    // Copy index.html separately to the root of static
+    from("$frontendDir/build/index.html")
+    into("$projectDir/src/main/resources/static")
+
+    inputs.dir("$frontendDir/build")  // Make Gradle track changes
+    outputs.dir("$projectDir/src/main/resources/static")
+}
+
+
+tasks.named('processResources') {
+    dependsOn 'copyFrontend'
+}
+
+// Hook frontend into bootJar
+bootJar {
+    dependsOn 'copyFrontend'
+}
+
+bootRun {
+    dependsOn 'copyFrontend'
+}
+
+springBoot {
+    mainClass = 'org.example.ProjectManager'
+}
