@@ -41,6 +41,10 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+### Generic ###
+env.properties
+*.db
+
 ### React ###
 # dependencies
 !**/src/main/frontend/node_modules
