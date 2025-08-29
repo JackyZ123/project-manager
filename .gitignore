@@ -44,6 +44,7 @@ bin/
 ### Generic ###
 env.properties
 *.db
+/projects
 
 ### React ###
 # dependencies
@@ -71,4 +72,3 @@ env.properties
 # Built Files
 !**/src/main/resources/static/react
 !**/src/main/resources/static/index.html
-

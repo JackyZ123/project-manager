@@ -24,7 +24,7 @@ public class Project {
 
     @Column(nullable=false)
     private LocalDateTime createdAt;
-    @Column(nullable=false)
+    @Column
     private LocalDateTime updatedAt;
 
     @Column(nullable=false)
@@ -39,6 +39,16 @@ public class Project {
 
     protected Project() {
         // JPA required no-args constructor
+    }
+
+    public Project(User owner, String name, String description, String githubRepoUrl, ProjectState state) {
+        this.owner = owner;
+        this.name = name;
+        this.description = description;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = null;
+        this.githubRepoUrl = githubRepoUrl;
+        this.state = state;
     }
 
     public Long getId() {

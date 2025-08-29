@@ -16,9 +16,6 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    // https://mvnrepository.com/artifact/org.webjars/bootstrap
-    implementation 'org.webjars:bootstrap:5.3.3'
-
     // https://mvnrepository.com/artifact/com.h2database/h2
     implementation 'com.h2database:h2:2.3.232'
 
